@@ -13,6 +13,7 @@
     "demo:link": "npm link && cd ./demo && npm link ion2-calendar",
     "demo:serve": "cd ./demo && ionic serve",
     "build": "run-s clean:dist build:copy-sources build:compile-scss build:ts",
+    "prepare": "run-s clean:dist build:copy-sources build:compile-scss build:ts",
     "build:ts": "tsc && ngc",
     "build:copy-sources": "gulp copy-sources",
     "build:compile-scss": "gulp copy-scss && gulp rename-scss && gulp clean-scss",
