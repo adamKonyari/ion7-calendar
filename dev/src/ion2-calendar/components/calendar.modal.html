@@ -48,15 +48,18 @@
 
     <!-- Affix -->
     <div class="bottom-affix-container flex-column">
-        <div class="bottom-affix bottom-affix-box affixed indicator-safearea flex-row">
-            <button class="button btn-default width50 mr-10" (click)="onCancel()">
-                <span *ngIf="_d.closeLabel !== '' && !_d.closeIcon">{{ _d.closeLabel }}</span>
-                <ion-icon *ngIf="_d.closeIcon" name="close"></ion-icon>
-            </button>
-            <button class="button btn-primary width50" (click)="done()">
-                <span *ngIf="_d.doneLabel !== '' && !_d.doneIcon">{{ _d.doneLabel }}</span>
-                <ion-icon *ngIf="_d.doneIcon" name="checkmark"></ion-icon>
-            </button>
+        <div class="bottom-affix bottom-affix-box affixed indicator-safearea text-center">
+            <span class="bold center mt-15" *ngIf="visibleDateRange">{{ visibleDateRange }}</span>
+            <div class="flex-row mt-15">
+                <button class="button btn-default width50 mr-10" (click)="onCancel()">
+                    <span *ngIf="_d.closeLabel !== '' && !_d.closeIcon">{{ _d.closeLabel }}</span>
+                    <ion-icon *ngIf="_d.closeIcon" name="close"></ion-icon>
+                </button>
+                <button class="button btn-primary width50" (click)="done()" [ngClass]="{ disabled: !isRangeAcceptable }">
+                    <span *ngIf="_d.doneLabel !== '' && !_d.doneIcon">{{ _d.doneLabel }}</span>
+                    <ion-icon *ngIf="_d.doneIcon" name="checkmark"></ion-icon>
+                </button>
+            </div>
         </div>
     </div>
 </ion-content>

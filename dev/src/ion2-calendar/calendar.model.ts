@@ -72,6 +72,8 @@ export interface CalendarModalOptions extends CalendarOptions {
    */
   showYearPicker?: boolean;
   defaultEndDateToStartDate?: boolean;
+  prepareVisibleRange?: Function;
+  handleInactiveTap?: Function;
 }
 
 export interface InternalCalendarModalOptions extends CalendarModalOptions {
