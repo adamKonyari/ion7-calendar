@@ -43,7 +43,9 @@ export class CalendarModal implements OnInit, AfterViewInit {
     public calendarMonths!: Array<CalendarMonth>;
     public datesTemp: Array<CalendarDay> = [null, null];
     public isRangeAcceptable: boolean
+    public onInfoIconClicked: Function;
     public prependingMonths = false;
+    public rangeLimit: number;
     public scrolledToInitialPosition = false;
     public showYearPicker!: boolean;
     public step!: number;
@@ -51,6 +53,7 @@ export class CalendarModal implements OnInit, AfterViewInit {
     public year!: number;
     public years!: Array<number>;
 
+    private isRangeOverLimit: boolean;
     private handleInactiveTap: Function;
     private prepareVisibleRange: Function;
 
@@ -93,8 +96,10 @@ export class CalendarModal implements OnInit, AfterViewInit {
             this._d
         );
 
-        this.prepareVisibleRange = this.options.prepareVisibleRange;
-        this.handleInactiveTap = this.options.handleInactiveTap;
+        this.rangeLimit = this._d.rangeLimit;
+        this.handleInactiveTap = this._d.handleInactiveTap;
+        this.prepareVisibleRange = this._d.prepareVisibleRange;
+        this.onInfoIconClicked = this._d.onInfoIconClicked;
     }
 
     initDefaultDate(): void {
@@ -121,14 +126,28 @@ export class CalendarModal implements OnInit, AfterViewInit {
             this.datesTemp = [null, null];
         }
 
-        this.visibleDateRange = this.prepareVisibleRange(this.calSvc.wrapResult(this.datesTemp, this._d.pickMode));
+        if (this.datesTemp) {
+            this.visibleDateRange = this.prepareVisibleRange(this.calSvc.wrapResult(this.datesTemp, this._d.pickMode));
+        }
+
         this.checkRangeValidity();
     }
 
-    checkRangeValidity(): void {
+    private checkRangeValidity(): void {
+        const nightsBetween = (startDate: Date, endDate: Date): number => {
+            const utc1 = Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+            const utc2 = Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+
+            return Math.floor((utc2 - utc1) / (1000 * 60 * 60 * 24));
+        }
+
         if (this._d.pickMode === 'range') {
             const calendarResult = this.calSvc.wrapResult(this.datesTemp, this._d.pickMode) as { from: CalendarResult, to: CalendarResult };
-            this.isRangeAcceptable = calendarResult.from.dateObj.getTime() !== calendarResult.to.dateObj.getTime();
+            const from = calendarResult.from.dateObj;
+            const to = calendarResult.to.dateObj;
+
+            this.isRangeOverLimit = nightsBetween(from, to) >= this.rangeLimit;
+            this.isRangeAcceptable = (from.getTime() !== to.getTime()) && !this.isRangeOverLimit;
         }
     }
 
@@ -152,6 +171,7 @@ export class CalendarModal implements OnInit, AfterViewInit {
         }
 
         this.visibleDateRange = this.prepareVisibleRange(this.calSvc.wrapResult(this.datesTemp, pickMode));
+
         this.checkRangeValidity();
 
         this.repaintDOM();
@@ -163,7 +183,7 @@ export class CalendarModal implements OnInit, AfterViewInit {
 
     done(): void {
         if (this._d.pickMode === 'range' && !this.isRangeAcceptable) {
-            this.handleInactiveTap();
+            this.handleInactiveTap(this.isRangeOverLimit);
             return;
         }
 

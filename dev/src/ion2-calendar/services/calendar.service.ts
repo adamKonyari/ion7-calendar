@@ -58,6 +58,10 @@ export class CalendarService {
       showAdjacentMonthDay = true,
       defaultEndDateToStartDate = false,
       clearLabel = null,
+      rangeLimit = null,
+      handleInactiveTap = null,
+      prepareVisibleRange = null,
+      onInfoIconClicked = null
     } = { ...this.defaultOpts, ...calendarOptions };
 
     return {
@@ -92,6 +96,10 @@ export class CalendarService {
       showAdjacentMonthDay,
       defaultEndDateToStartDate,
       clearLabel,
+      rangeLimit,
+      handleInactiveTap,
+      prepareVisibleRange,
+      onInfoIconClicked
     };
   }
 
@@ -264,14 +272,14 @@ export class CalendarService {
   wrapResult(original: Array<CalendarDay>, pickMode: string | undefined) {
     if (pickMode === pickModes.SINGLE) {
       // @ts-ignore
-      return this.multiFormat(original[0].time);
+      return this.multiFormat(original[0]?.time);
     }
     if (pickMode === pickModes.RANGE) {
       return {
         // @ts-ignore
-        from: this.multiFormat(original[0].time),
+        from: this.multiFormat(original[0]?.time),
         // @ts-ignore
-        to: this.multiFormat((original[1] || original[0]).time),
+        to: this.multiFormat((original[1] || original[0])?.time),
       };
     }
     if (pickMode === pickModes.MULTI) {
